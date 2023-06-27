@@ -1,12 +1,31 @@
-﻿using UnityEngine;
+﻿using Extension;
+using Interface;
+using UnityEngine;
 
 namespace Model.Graph
 {
     public class Edge: MonoBehaviour, IEdge
     {
-        [SerializeField] private Node firstNode;
-        [SerializeField] private Node secondNode;
+        [SerializeField] [ReadOnlyInspector] private Node firstNode;
+        [SerializeField] [ReadOnlyInspector] private Node secondNode;
+        [SerializeField] [ReadOnlyInspector] private LineDrawer drawer;
         public INode FirsNode => firstNode;
         public INode SecondNode => secondNode;
+
+        public void Initialise(Node firstNode, Node secondNode)
+        {
+            this.firstNode = firstNode;
+            this.secondNode = secondNode;
+            drawer = GetComponent<LineDrawer>();
+            drawer.Initialise(firstNode.transform, secondNode.transform);
+        }
+
+        public void ReDraw()
+        {
+            drawer.DrawLine();
+        }
+
+        public Node GetFirstNode() => firstNode;
+        public Node GetSecondNode() => secondNode;
     }
 }
