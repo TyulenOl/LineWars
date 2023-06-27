@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Interface
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class LineDrawer : MonoBehaviour
+    public class LineDrawer : MonoBehaviour, ILineDrawer
     {
         [SerializeField] [HideInInspector] private SpriteRenderer lineSpriteRenderer;
         [SerializeField] [HideInInspector] private Transform firstTransform;

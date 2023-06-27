@@ -92,6 +92,7 @@ namespace Model.Graph.Editor
             EditorUtility.SetDirty(firstNode);
             EditorUtility.SetDirty(secondNode);
             
+            
             return edge;
         }
 
@@ -119,6 +120,7 @@ namespace Model.Graph.Editor
             var node = Instantiate(nodePrefab, GetMousePosition(), Quaternion.identity, graph.transform);
             node.Initialise();
             Selection.activeObject = node;
+           
             
             EditorUtility.SetDirty(node);
             return node;

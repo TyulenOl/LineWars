@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Model.Graph
 {
     public class Node : MonoBehaviour, INode
     {
-        [SerializeField] [HideInInspector] private List<Edge> edges;
+        [SerializeField] [ReadOnly] private List<Edge> edges;
         public IReadOnlyCollection<IEdge> Edges => edges;
         public List<Edge> GetEdgesList() => edges;
         public void Initialise()
