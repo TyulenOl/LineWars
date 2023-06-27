@@ -26,16 +26,33 @@ namespace Model.Graph.Editor
         public override void OnActivated()
         {
             base.OnActivated();
-            Debug.Log("CreateGraph is Activated!");
-            
+
             edgePrefab = Resources.Load<Edge>("Prefabs/Line");
             nodePrefab = Resources.Load<Node>("Prefabs/Node");
             graph = GameObject.Find("Graph");
+            foreach (var gameObject in FindObjectsOfType<GameObject>())
+            {
+                SceneVisibilityManager.instance.DisablePicking(gameObject,false);
+            }
+            foreach (var node in FindObjectsOfType<Node>())
+            {
+                SceneVisibilityManager.instance.EnablePicking(node.gameObject,false);
+            }
+            SceneVisibilityManager.instance.EnablePicking(graph,false);
+            EditorApplication.RepaintHierarchyWindow();
+            
+            
+            Debug.Log("CreateGraph is Activated!");
         }
 
         public override void OnWillBeDeactivated()
         {
             base.OnWillBeDeactivated();
+            foreach (var gameObject in FindObjectsOfType<GameObject>())
+            {
+                SceneVisibilityManager.instance.EnablePicking(gameObject, false);
+            }
+            EditorApplication.RepaintHierarchyWindow();
             Debug.Log("CreateGraph is Deactivated!");
         }
 
@@ -83,18 +100,26 @@ namespace Model.Graph.Editor
 
         private Edge ConnectNodes(Node firstNode, Node secondNode)
         {
-            var edge = Instantiate(edgePrefab);
+            var edge = CreateEdge();
+            
             edge.Initialise(firstNode, secondNode);
             firstNode.AddEdge(edge);
             secondNode.AddEdge(edge);
             
-            EditorUtility.SetDirty(edge);
             EditorUtility.SetDirty(firstNode);
             EditorUtility.SetDirty(secondNode);
+            EditorUtility.SetDirty(edge);
             
             return edge;
         }
 
+        private Edge CreateEdge()
+        {
+            var edge = Instantiate(edgePrefab, graph.transform);
+            SceneVisibilityManager.instance.DisablePicking(edge.gameObject, false);
+            return edge;
+        }
+        
         private void DisconnectNodes(Node firstNode, Node secondNode)
         {
             var intersect = GetIntersectEdges(firstNode, secondNode);
@@ -107,7 +132,7 @@ namespace Model.Graph.Editor
             {
                 firstNode.RemoveEdge(edge);
                 secondNode.RemoveEdge(edge);
-                DestroyImmediate(edge);
+                DestroyImmediate(edge.gameObject);
             }
             
             EditorUtility.SetDirty(firstNode);
@@ -116,10 +141,10 @@ namespace Model.Graph.Editor
 
         private Node CreateNode()
         {
-            var node = Instantiate(nodePrefab, GetMousePosition(), Quaternion.identity, graph.transform);
+            var node = Instantiate(nodePrefab, GetMousePosition2D(), Quaternion.identity, graph.transform);
             node.Initialise();
-            Selection.activeObject = node;
-            
+            Selection.activeObject = node.gameObject;
+
             EditorUtility.SetDirty(node);
             return node;
         }
@@ -127,9 +152,9 @@ namespace Model.Graph.Editor
         public void DeleteNode(Node node)
         {
             node.BeforeDestroy(out var deletedEdges, out var neighbors);
-            DestroyImmediate(node);
+            DestroyImmediate(node.gameObject);
             foreach (var edge in deletedEdges)
-                DestroyImmediate(edge);
+                DestroyImmediate(edge.gameObject);
             foreach (var neighbor in neighbors)
                 EditorUtility.SetDirty(neighbor);
         }
@@ -185,13 +210,13 @@ namespace Model.Graph.Editor
                 .ToList();
         }
 
-        private Vector3 GetMousePosition()
+        private Vector2 GetMousePosition2D()
         {
             var mousePos = Event.current.mousePosition;
             var mouseX = mousePos.x;
             var mouseY = Camera.current.pixelHeight - mousePos.y;
-            var myRay = Camera.current.ScreenPointToRay(new Vector3(mouseX, mouseY, 0));
-            return Physics.Raycast(myRay, out var hitInfo) ? hitInfo.point : default(Vector2);
+            var coord = Camera.current.ScreenToWorldPoint(new Vector3(mouseX, mouseY, 0));
+            return coord;
         }
     }
 }
