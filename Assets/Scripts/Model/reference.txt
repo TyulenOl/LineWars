@@ -1,0 +1,2 @@
+﻿https://mirror-networking.gitbook.io/docs/
+https://github.com/VeriorPies/ParrelSync
