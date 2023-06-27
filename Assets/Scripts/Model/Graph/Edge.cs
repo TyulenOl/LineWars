@@ -18,6 +18,7 @@ namespace Model.Graph
             this.secondNode = secondNode;
             drawer = GetComponent<ILineDrawer>();
             drawer.Initialise(firstNode.transform, secondNode.transform);
+            
         }
 
         public void ReDraw()
