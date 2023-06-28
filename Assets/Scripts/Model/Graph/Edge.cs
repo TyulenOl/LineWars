@@ -8,15 +8,16 @@ namespace Model.Graph
     {
         [SerializeField] [ReadOnlyInspector] private Node firstNode;
         [SerializeField] [ReadOnlyInspector] private Node secondNode;
-        [SerializeField] [ReadOnlyInspector] private ILineDrawer drawer;
+        [SerializeField] [ReadOnlyInspector] private LineDrawer drawer;
         public INode FirsNode => firstNode;
         public INode SecondNode => secondNode;
+        public LineDrawer Drawer => drawer;
 
         public void Initialise(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;
-            drawer = GetComponent<ILineDrawer>();
+            drawer = GetComponent<LineDrawer>();
             drawer.Initialise(firstNode.transform, secondNode.transform);
             
         }

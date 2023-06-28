@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Extension;
 using Unity.Collections;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Model.Graph
 {
     public class Node : MonoBehaviour, INode
     {
-        [SerializeField] [ReadOnly] private List<Edge> edges;
+        [SerializeField] [ReadOnlyInspector] private List<Edge> edges;
         public IReadOnlyCollection<IEdge> Edges => edges;
         public List<Edge> GetEdgesList() => edges;
         public void Initialise()

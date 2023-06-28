@@ -30,17 +30,15 @@ namespace Model.Graph.Editor
             edgePrefab = Resources.Load<Edge>("Prefabs/Line");
             nodePrefab = Resources.Load<Node>("Prefabs/Node");
             graph = GameObject.Find("Graph");
+            
             foreach (var gameObject in FindObjectsOfType<GameObject>())
-            {
                 SceneVisibilityManager.instance.DisablePicking(gameObject,false);
-            }
+            
             foreach (var node in FindObjectsOfType<Node>())
-            {
                 SceneVisibilityManager.instance.EnablePicking(node.gameObject,false);
-            }
+            
             SceneVisibilityManager.instance.EnablePicking(graph,false);
             EditorApplication.RepaintHierarchyWindow();
-            
             
             Debug.Log("CreateGraph is Activated!");
         }
@@ -49,9 +47,8 @@ namespace Model.Graph.Editor
         {
             base.OnWillBeDeactivated();
             foreach (var gameObject in FindObjectsOfType<GameObject>())
-            {
                 SceneVisibilityManager.instance.EnablePicking(gameObject, false);
-            }
+            
             EditorApplication.RepaintHierarchyWindow();
             Debug.Log("CreateGraph is Deactivated!");
         }
@@ -100,16 +97,20 @@ namespace Model.Graph.Editor
 
         private Edge ConnectNodes(Node firstNode, Node secondNode)
         {
-            var edge = CreateEdge();
+            Undo.IncrementCurrentGroup();
             
+            var edge = CreateEdge();
             edge.Initialise(firstNode, secondNode);
+            
+            
+            Undo.RecordObject(firstNode, "ConnectNodes");
             firstNode.AddEdge(edge);
+            Undo.RecordObject(secondNode, "ConnectNodes");
             secondNode.AddEdge(edge);
             
             EditorUtility.SetDirty(firstNode);
             EditorUtility.SetDirty(secondNode);
             EditorUtility.SetDirty(edge);
-            
             
             return edge;
         }
@@ -117,6 +118,7 @@ namespace Model.Graph.Editor
         private Edge CreateEdge()
         {
             var edge = Instantiate(edgePrefab, graph.transform);
+            Undo.RegisterCreatedObjectUndo(edge.gameObject, "CreateEdge");
             SceneVisibilityManager.instance.DisablePicking(edge.gameObject, false);
             return edge;
         }
@@ -129,11 +131,15 @@ namespace Model.Graph.Editor
 
         private void DisconnectNodes(Node firstNode, Node secondNode, List<Edge> intersect)
         {
+            Undo.IncrementCurrentGroup();
+            Undo.RecordObject(firstNode, "DisconnectNodes");
+            Undo.RecordObject(secondNode, "DisconnectNodes");
+            
             foreach (var edge in intersect)
             {
                 firstNode.RemoveEdge(edge);
                 secondNode.RemoveEdge(edge);
-                DestroyImmediate(edge.gameObject);
+                Undo.DestroyObjectImmediate(edge.gameObject);
             }
             
             EditorUtility.SetDirty(firstNode);
@@ -142,10 +148,13 @@ namespace Model.Graph.Editor
 
         private Node CreateNode()
         {
+            Undo.IncrementCurrentGroup();
+            
             var node = Instantiate(nodePrefab, GetMousePosition2D(), Quaternion.identity, graph.transform);
             node.Initialise();
             Selection.activeObject = node.gameObject;
 
+            Undo.RegisterCreatedObjectUndo(node.gameObject, "CreateNode");
             EditorUtility.SetDirty(node);
             return node;
         }
@@ -164,8 +173,8 @@ namespace Model.Graph.Editor
         {
             if (target is GameObject activeObj)
             {
-                if (target.GetComponent<Node>() == null)
-                    return;
+                if (target.GetComponent<Node>() == null) return;
+                
                 EditorGUI.BeginChangeCheck();
                 var oldPos = activeObj.transform.position;
                 var newPos = Handles.PositionHandle(oldPos, Quaternion.identity);
@@ -189,9 +198,14 @@ namespace Model.Graph.Editor
         private void ReDrawEdges(Node node)
         {
             foreach (var edge in node.GetEdgesList())
+            {
+                Undo.RecordObject(edge.transform, "ReDrawEdge");
+                Undo.RecordObject(edge.Drawer.LineSpriteRenderer, "ReDrawEdge");
                 edge.ReDraw();
+            }
         }
-
+        
+        
 
         private bool CheckGameObjectForExistAnyComponents(GameObject o, params Type[] components)
         {

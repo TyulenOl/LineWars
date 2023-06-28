@@ -4,12 +4,13 @@ using UnityEngine;
 namespace Interface
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class LineDrawer : MonoBehaviour, ILineDrawer
+    public class LineDrawer : MonoBehaviour
     {
         [SerializeField] [HideInInspector] private SpriteRenderer lineSpriteRenderer;
         [SerializeField] [HideInInspector] private Transform firstTransform;
         [SerializeField] [HideInInspector] private Transform secondTransform;
-
+        public SpriteRenderer LineSpriteRenderer => lineSpriteRenderer;
+        
         public void Initialise(Transform first, Transform second)
         {
             lineSpriteRenderer = GetComponent<SpriteRenderer>();
