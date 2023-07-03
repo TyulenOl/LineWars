@@ -8,7 +8,9 @@ namespace Model.Graph
     public class Graph: MonoBehaviour, IGraph
     {
         public static Graph Instance { get; private set; }
-        
+        private List<INode> nodes;
+
+        public IEnumerable<INode> GetNodes() => nodes ?? FindNodes();
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -20,9 +22,15 @@ namespace Model.Graph
                 Instance = this;
             }
         }
-        
-        public IEnumerable<INode> GetNodes() => FindNodes();
 
+        private void Start()
+        {
+            nodes = new List<INode>();
+        }
+
+        public void RegisterNode(INode node) => nodes.Add(node);
+
+        // onlyEditor
         private IEnumerable<INode> FindNodes()
         {
             return transform.GetChildes()

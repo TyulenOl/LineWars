@@ -1,22 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Controllers;
 using Extension;
 using Interface;
-using Unity.Collections;
+using Mirror;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Model.Graph
 {
-    public class Node : MonoBehaviour, INode
+    public class Node : NetworkBehaviour, INode
     {
+        [SyncVar] private uint id;
+        
         [SerializeField] [ReadOnlyInspector] private List<Edge> edges;
         [SerializeField] private Outline2D outline;
         
         public Vector2 Position => transform.position;
         public IReadOnlyCollection<IEdge> Edges => edges;
         public IReadOnlyList<Edge> GetEdgesList() => edges;
+
+        public uint Id
+        {
+            get => id;
+            set => id = value;
+        }
+
+        public override void OnStartClient()
+        {
+            Debug.Log("Node OnStartClient");
+            base.OnStartClient();
+            
+            Initialize();
+            Graph.Instance.RegisterNode(this);
+            transform.SetParent(Graph.Instance.transform);
+            transform.position = 
+                LineWarsNetworkManager.Instance
+                .GetGraphData()
+                .NodesPositions[id];
+        }
+
         public void Initialize()
         {
             edges = new List<Edge>();

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extension;
 using UnityEngine;
 
 namespace Model.Graph
@@ -28,9 +27,11 @@ namespace Model.Graph
         private int currentEdgeIndex;
         private List<INode> graph;
 
-        public IEnumerable<Vector2> NodesPositions => nodes;
+        public Vector2[] NodesPositions => nodes.ToArray();
 
-        public IEnumerable<Tuple<int,int>> Edges => edges.Select(x => Tuple.Create(x.First,x.Second));
+        public (int,int)[] Edges => edges
+            .Select(x => (x.First,x.Second))
+            .ToArray();
 
         public void Initialize(IReadOnlyCollection<INode> graph)
         {
