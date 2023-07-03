@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Controllers;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,10 +10,6 @@ namespace Model.Graph
     [CustomEditor(typeof(Graph))]
     public class GraphEditor: Editor
     {
-        private const string LEVELS_DIRECTORY_NAME = "Levels";
-        private const string LEVEL_FILE_NAME = "Level.asset";
-        
-        
         private DirectoryInfo assetsDirectory;
         private DirectoryInfo levelsDirectory;
         private Graph Graph => (Graph) target;
@@ -45,7 +42,7 @@ namespace Model.Graph
         private string GetUniqueRelativePath()
         {
             var relativePath = Path.GetRelativePath(assetsDirectory.Parent.FullName, levelsDirectory.FullName);
-            var assetFileName = Path.Join(relativePath, LEVEL_FILE_NAME);
+            var assetFileName = Path.Join(relativePath, LevelManager.LEVEL_FILE_NAME);
             var uniqueAssetFileName = AssetDatabase
                 .GenerateUniqueAssetPath(assetFileName);
             return uniqueAssetFileName;
@@ -53,10 +50,8 @@ namespace Model.Graph
 
         private void FindLevelsDirectory()
         {
-            assetsDirectory = new DirectoryInfo(Application.dataPath);
-            levelsDirectory = assetsDirectory
-                .EnumerateDirectories($"{LEVELS_DIRECTORY_NAME}", SearchOption.AllDirectories)
-                .First();
+            assetsDirectory = LevelManager.AssetsDirectory;
+            levelsDirectory = LevelManager.LevelsDirectory;
         }
     }
 }
