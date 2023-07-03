@@ -8,14 +8,14 @@ using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEngine;
 
-namespace Model.Graph.Editor
+namespace Model.Graph
 {
     [EditorTool("CreateGraph")]
     public class GraphTool : EditorTool
     {
         private Edge edgePrefab;
         private Node nodePrefab;
-        private GameObject graph;
+        private Graph graph;
 
         private Type[] graphTypes = new[]
         {
@@ -31,7 +31,9 @@ namespace Model.Graph.Editor
             
             edgePrefab = Resources.Load<Edge>("Prefabs/Line");
             nodePrefab = Resources.Load<Node>("Prefabs/Node");
-            graph = GameObject.Find("Graph") ?? new GameObject("Graph");
+
+            var graphObj = GameObject.Find("Graph") ?? new GameObject("Graph");
+            graph = graphObj.GetComponent<Graph>() ?? graphObj.AddComponent<Graph>();
 
             foreach (var gameObject in FindObjectsOfType<GameObject>())
                 SceneVisibilityManager.instance.DisablePicking(gameObject,false);
@@ -39,7 +41,7 @@ namespace Model.Graph.Editor
             foreach (var node in FindObjectsOfType<Node>())
                 SceneVisibilityManager.instance.EnablePicking(node.gameObject,false);
             
-            SceneVisibilityManager.instance.EnablePicking(graph,false);
+            SceneVisibilityManager.instance.EnablePicking(graph.gameObject,false);
             EditorApplication.RepaintHierarchyWindow();
 
             nodeListener = new SelectionListener<Node>();

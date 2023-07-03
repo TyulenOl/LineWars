@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Extension;
 using UnityEngine;
 
 namespace Model.Graph
@@ -8,7 +9,7 @@ namespace Model.Graph
     public class GraphData: ScriptableObject
     {
         [Serializable]
-        private class Edge
+        public class Edge
         {
             [SerializeField] public int First;
             [SerializeField] public int Second;
