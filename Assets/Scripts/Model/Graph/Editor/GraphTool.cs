@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Extensions;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -16,21 +17,22 @@ namespace Model.Graph.Editor
         private Node nodePrefab;
         private GameObject graph;
 
-
         private Type[] graphTypes = new[]
         {
             typeof(Node),
             typeof(Edge)
         };
         
+        private SelectionListener<Node> nodeListener;
+
         public override void OnActivated()
         {
             base.OnActivated();
-
+            
             edgePrefab = Resources.Load<Edge>("Prefabs/Line");
             nodePrefab = Resources.Load<Node>("Prefabs/Node");
-            graph = GameObject.Find("Graph");
-            
+            graph = GameObject.Find("Graph") ?? new GameObject("Graph");
+
             foreach (var gameObject in FindObjectsOfType<GameObject>())
                 SceneVisibilityManager.instance.DisablePicking(gameObject,false);
             
@@ -39,35 +41,57 @@ namespace Model.Graph.Editor
             
             SceneVisibilityManager.instance.EnablePicking(graph,false);
             EditorApplication.RepaintHierarchyWindow();
-            
+
+            nodeListener = new SelectionListener<Node>();
+
             Debug.Log("CreateGraph is Activated!");
         }
+        
 
         public override void OnWillBeDeactivated()
         {
             base.OnWillBeDeactivated();
+            OnDisable();
+
+            Debug.Log("CreateGraph is Deactivated!");
+        }
+
+        private void OnDisable()
+        {
             foreach (var gameObject in FindObjectsOfType<GameObject>())
                 SceneVisibilityManager.instance.EnablePicking(gameObject, false);
             
             EditorApplication.RepaintHierarchyWindow();
-            Debug.Log("CreateGraph is Deactivated!");
         }
 
         public override void OnToolGUI(EditorWindow window)
         {
             UsePositionHandle();
+            DrawOutlineForActiveNodes();
             if (Event.current.Equals(Event.KeyboardEvent("k")))
             {
                 PutNodeInMousePosition();
             }
         }
+        
+        
+        private void DrawOutlineForActiveNodes()
+        {
+            foreach (var activatedNode in nodeListener.GetActivated())
+            {
+                activatedNode.SetActiveOutline(true);
+            }
+            
+            foreach (var disableNode in nodeListener.GetDisabled())
+            {
+                disableNode.SetActiveOutline(false);
+            }
+            
+        }
 
         private void PutNodeInMousePosition()
         {
-            var activeNodes = Selection.gameObjects
-                .Select(o => o.GetComponent<Node>())
-                .Where(o => o != null)
-                .ToArray();
+            var activeNodes = nodeListener.GetActive().ToArray();
             switch (activeNodes.Length)
             {
                 case 0:
@@ -85,6 +109,7 @@ namespace Model.Graph.Editor
                     break;
             }
         }
+        
 
         private void ConnectOrDisconnectNodes(Node firstNode, Node secondNode)
         {
@@ -100,7 +125,7 @@ namespace Model.Graph.Editor
             Undo.IncrementCurrentGroup();
             
             var edge = CreateEdge();
-            edge.Initialise(firstNode, secondNode);
+            edge.Initialize(firstNode, secondNode);
             
             
             Undo.RecordObject(firstNode, "ConnectNodes");
@@ -151,11 +176,12 @@ namespace Model.Graph.Editor
             Undo.IncrementCurrentGroup();
             
             var node = Instantiate(nodePrefab, GetMousePosition2D(), Quaternion.identity, graph.transform);
-            node.Initialise();
+            node.Initialize();
             Selection.activeObject = node.gameObject;
 
             Undo.RegisterCreatedObjectUndo(node.gameObject, "CreateNode");
             EditorUtility.SetDirty(node);
+
             return node;
         }
 
@@ -205,8 +231,6 @@ namespace Model.Graph.Editor
             }
         }
         
-        
-
         private bool CheckGameObjectForExistAnyComponents(GameObject o, params Type[] components)
         {
             foreach (var component in components)
@@ -229,8 +253,8 @@ namespace Model.Graph.Editor
         {
             var mousePos = Event.current.mousePosition;
             var mouseX = mousePos.x;
-            var mouseY = Camera.current.pixelHeight - mousePos.y;
-            var coord = Camera.current.ScreenToWorldPoint(new Vector3(mouseX, mouseY, 0));
+            var mouseY = SceneView.currentDrawingSceneView.camera.pixelHeight - mousePos.y;
+            var coord = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(new Vector3(mouseX, mouseY, 0));
             return coord;
         }
     }

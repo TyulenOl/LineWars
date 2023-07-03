@@ -6,27 +6,39 @@ using UnityEngine.Serialization;
 
 namespace Model
 {
-    public class Unit: MonoBehaviour, IUnit
+    public class Unit: NetworkBehaviour, IUnit
     { 
         [SerializeField] private InitialBaseUnitCharacteristics initialBaseUnitCharacteristics;
-        protected BaseUnitCharacteristics baseUnitCharacteristics;
+        
+        protected BaseUnitCharacteristics BaseUnitCharacteristics;
+        
+        protected NetworkIdentity NetworkIdentity;
+        protected UnitMovementLogic MovementLogic;
 
-        private NetworkIdentity networkIdentity;
-
+        public uint Id => NetworkIdentity.assetId;
+        public int Hp => BaseUnitCharacteristics.Hp;
+        public int Armor => BaseUnitCharacteristics.Armor;
+        public int MeleeDamage => BaseUnitCharacteristics.MeleeDamage;
+        public int Speed => BaseUnitCharacteristics.Speed;
+        public UnitSize GetSize() => BaseUnitCharacteristics.UnitSize;
+        public LineType GetMinimaLineType() => BaseUnitCharacteristics.MovingLineType;
+        
         private void Awake()
         {
-            baseUnitCharacteristics = new BaseUnitCharacteristics(initialBaseUnitCharacteristics);
-            networkIdentity = GetComponent<NetworkIdentity>();
+            BaseUnitCharacteristics = new BaseUnitCharacteristics(initialBaseUnitCharacteristics);
+            NetworkIdentity = GetComponent<NetworkIdentity>();
+            MovementLogic = GetComponent<UnitMovementLogic>();
         }
 
-        public uint Id => networkIdentity.assetId;
-        public int Hp => baseUnitCharacteristics.Hp;
-        public int Armor => baseUnitCharacteristics.Armor;
-        public int MeleeDamage => baseUnitCharacteristics.MeleeDamage;
-        public int Speed => baseUnitCharacteristics.Speed;
-        public UnitSize GetSize() => baseUnitCharacteristics.UnitSize;
-        public LineType GetMinimaLineType() => baseUnitCharacteristics.MovingLineType;
-        
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            if (GetComponent<UnitMovementLogic>() == null)
+            {
+                Debug.LogWarning($"у {name} не обнаружен компонент {nameof(UnitMovementLogic)}");
+            }
+        }
+
         public void Accept(Hit hit)
         {
             throw new NotImplementedException();
@@ -37,6 +49,9 @@ namespace Model
             throw new NotImplementedException();
         }
 
-      
+        public void MoveTo(INode targetNode)
+        {
+            MovementLogic.MoveTo(targetNode.Position);
+        }
     }
 }

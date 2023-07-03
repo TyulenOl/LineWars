@@ -2,7 +2,7 @@
 
 namespace Model
 {
-    public interface IUnit: IIdentityObject, IAlive, IHitHandler, IHitCreator
+    public interface IUnit: IIdentityObject, IAlive, IHitHandler, IHitCreator, IMovable
     {
         public int Armor { get; }
         public int MeleeDamage { get; }

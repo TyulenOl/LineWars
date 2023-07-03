@@ -21,5 +21,17 @@ namespace Model
             UnitSize = characteristics.UnitSize;
             MovingLineType = characteristics.MovingLineType;
         }
+
+        private BaseUnitCharacteristics(BaseUnitCharacteristics other)
+        {
+            Hp = other.Hp;
+            Armor = other.Armor;
+            MeleeDamage = other.MeleeDamage;
+            Speed = other.Speed;
+            UnitSize = other.UnitSize;
+            MovingLineType = other.MovingLineType;
+        }
+
+        public BaseUnitCharacteristics CreateCopy() => new BaseUnitCharacteristics(this);
     }
 }

@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using Extension;
+using Interface;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Model.Graph
 {
     public class Node : MonoBehaviour, INode
     {
         [SerializeField] [ReadOnlyInspector] private List<Edge> edges;
+        [SerializeField] private Outline2D outline;
+        
+        public Vector2 Position => transform.position;
         public IReadOnlyCollection<IEdge> Edges => edges;
-        public List<Edge> GetEdgesList() => edges;
-        public void Initialise()
+        public IReadOnlyList<Edge> GetEdgesList() => edges;
+        public void Initialize()
         {
             edges = new List<Edge>();
         }
@@ -50,5 +55,6 @@ namespace Model.Graph
 
         public bool RemoveEdge(Edge edge) => edges.Remove(edge);
 
+        public void SetActiveOutline(bool value) => outline.SetActiveOutline(value);
     }
 }

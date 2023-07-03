@@ -6,10 +6,11 @@ using UnityEngine;
 
 namespace Model.Graph
 {
-    public class Line: MonoBehaviour, IAlive, IHitHandler
+    public class Line: NetworkBehaviour, IAlive, IHitHandler
     {
-        [SerializeField][Min(1)] private int maxHp;
-        [SerializeField] [ReadOnlyInspector] private int hp;
+        [SerializeField] [Min(1)] private int maxHp;
+        [SerializeField] [ReadOnlyInspector] [SyncVar] private int hp;
+        
         private IEdge edge;
 
         public int Hp => hp;
@@ -18,8 +19,9 @@ namespace Model.Graph
             edge = GetComponent<IEdge>();
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             hp = maxHp;
         }
 

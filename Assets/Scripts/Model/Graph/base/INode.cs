@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Model.Graph
 {
     public interface INode
     {
+        public Vector2 Position { get; }
         public IReadOnlyCollection<IEdge> Edges { get; }
 
         public IEnumerable<INode> GetNeighbors()

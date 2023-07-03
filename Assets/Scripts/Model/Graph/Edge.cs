@@ -13,7 +13,7 @@ namespace Model.Graph
         public INode SecondNode => secondNode;
         public LineDrawer Drawer => drawer;
 
-        public void Initialise(Node firstNode, Node secondNode)
+        public void Initialize(Node firstNode, Node secondNode)
         {
             this.firstNode = firstNode;
             this.secondNode = secondNode;

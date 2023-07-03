@@ -549,10 +549,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -693.5999755859375,
-            "y": -182.40000915527345,
-            "width": 145.5999755859375,
-            "height": 127.20004272460938
+            "x": -693.5999145507813,
+            "y": -429.5999755859375,
+            "width": 208.0,
+            "height": 311.1999816894531
         }
     },
     "m_Slots": [
@@ -566,7 +566,7 @@
         "coordinates"
     ],
     "m_Precision": 0,
-    "m_PreviewExpanded": false,
+    "m_PreviewExpanded": true,
     "m_PreviewMode": 0,
     "m_CustomColors": {
         "m_SerializableColors": []
