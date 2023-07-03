@@ -37,6 +37,7 @@ namespace Controllers
 
         public static void LoadLevel(int mapIndex)
         {
+            Debug.Log("LoadingLevel");
             var graphData = Resources.Load<GraphData>($"Levels/Level{mapIndex}");
             var graphTransform = Graph.Instance.transform;
             foreach (var node in graphData.NodesPositions)
@@ -60,6 +61,7 @@ namespace Controllers
                 
                 NetworkServer.Spawn(instance.gameObject);
             }
+            Debug.Log("LevelLoaded");
         }
         
         private static DirectoryInfo FindLevelsDirectory()
