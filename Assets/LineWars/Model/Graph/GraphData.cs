@@ -28,6 +28,10 @@ namespace Model.Graph
         private int currentEdgeIndex;
         private List<INode> graph;
 
+        public IEnumerable<Vector2> NodesPositions => nodes;
+
+        public IEnumerable<Tuple<int,int>> Edges => edges.Select(x => Tuple.Create(x.First,x.Second));
+
         public void Initialize(IReadOnlyCollection<INode> graph)
         {
             var nodesCount = graph.Count;
